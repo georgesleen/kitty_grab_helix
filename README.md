@@ -52,7 +52,8 @@ A count typed before a command repeats it, so `5j` and `3x` do what you expect.
 
 `Ctrl+v` is the one key here helix does not have: helix has no columnar
 selection, and a terminal scrollback full of columns is exactly where you want
-one.
+one. It starts extending as it switches, since a rectangle that collapses on
+every motion would only ever be one cell.
 
 ## Install
 

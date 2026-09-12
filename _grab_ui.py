@@ -222,6 +222,9 @@ class GrabHandler(Handler):
     def _columnar_mode(self, count: int) -> None:
         self.region = (StreamRegion if self.region is ColumnarRegion
                        else ColumnarRegion)
+        # A rectangle that collapses on every motion is no use, so entering
+        # columnar selection also starts extending.
+        self.select_mode = self.select_mode or self.region is ColumnarRegion
         self._redraw()
 
     def _collapse_selection(self, count: int) -> None:
