@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Local gate: the checks CI runs, before anything leaves the machine.
+set -euo pipefail
+
+echo "[pre-push] nix format check..."
+nixfmt --check ./*.nix
+
+echo "[pre-push] lint..."
+ruff check .
+
+echo "[pre-push] tests..."
+pytest -q
+
+echo "[pre-push] all checks passed."

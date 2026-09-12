@@ -1,13 +1,10 @@
-import os
-from typing import Any, Dict, List, Sequence
+# Entry point kitty loads. It hands the window's full scrollback to the real
+# kitten in _grab_ui, which runs as an overlay.
+
+from typing import Any, Dict, List
 
 from kittens.tui.handler import result_handler
-try:
-    # For kitty v0.42+
-    from kitty.typing_compat import BossType
-except ModuleNotFoundError:
-    # Fallback for older versions of kitty.
-    from kitty.typing import BossType
+from kitty.typing_compat import BossType
 
 import _grab_ui
 
@@ -17,12 +14,12 @@ def main(args: List[str]) -> None:
 
 
 @result_handler(no_ui=True)
-def handle_result(args: List[str], data: Dict[str, Any], target_window_id: int, boss: BossType) -> None:
+def handle_result(args: List[str], data: Dict[str, Any], target_window_id: int,
+                  boss: BossType) -> None:
     window = boss.window_id_map.get(target_window_id)
     if window is None:
         return
-    tab = window.tabref()
-    if tab is None:
+    if window.tabref() is None:
         return
     content = window.as_text(as_ansi=True, add_history=True,
                              add_wrap_markers=True)

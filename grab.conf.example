@@ -1,90 +1,62 @@
-# vim:fileencoding=utf-8:ft=conf:foldmethod=marker
+# kitty-grab-helix configuration. Copy to ~/.config/kitty/grab.conf and
+# uncomment what you want to change. Nothing here needs a kitty reload: the
+# file is read each time the kitten starts.
+#
+# Colours are #rgb or #rrggbb.
 
-#: Colors {{{
+# selection_foreground #ffffff
+# selection_background #5294e2
+# cursor               #ad7fa8
 
-# selection_foreground #FFFFFF
-# selection_background #5294E2
+# Characters that count as part of a word, on top of letters and digits.
+# Empty takes kitty's own select_by_word_characters.
+# select_by_word_characters @-./_~?&=%+#
 
-#: Colors for selected text while grabbing.
+# Keys are written as in kitty.conf (ctrl+u, alt+;, shift+x) or as in helix
+# (C-u, A-;, X); a sequence is chords joined with > (g>g). `unmap <keys>`
+# drops one binding and `clear_all_shortcuts` drops them all, so you can
+# start from nothing.
+#
+# The default map, in full:
 
-# cursor #ad7fa8
-
-#: Cursor color while grabbing.
-
-#: }}}
-
-#: Key shortcuts {{{
-
-# map q      quit
-# map Escape quit
-
-#: Exit the grabber without copying anything.
-
-# map Enter confirm
-
-#: Copy the selected region to clipboard and exit.
-
-# map Left      move left
-# map Right     move right
-# map Up        move up
-# map Down      move down
-# map Page_Up   move page up
-# map Page_Down move page down
-# map Home      move first
-# map a         move first nonwhite
-# map End       move last nonwhite
-# map e         move last
-# map Ctrl+Home  move top
-# map Ctrl+End   move bottom
-# map Ctrl+Left  move word left
-# map Ctrl+Right move word right
-
-#: Cancel selection and move the cursor around the screen.
-#: This will scroll the buffer if needed and possible.
-
-# map Ctrl+Up   scroll up
-# map Ctrl+Down scroll down
-
-#: Scroll the buffer, if possible.
-#: Cursor stays in the same position relative to the screen.
-
-# map Shift+Left      select stream left
-# map Shift+Right     select stream right
-# map Shift+Up        select stream up
-# map Shift+Down      select stream down
-# map Shift+Page_Up   select stream page up
-# map Shift+Page_Down select stream page down
-# map Shift+Home      select stream first
-# map A               select stream first nonwhite
-# map Shift+End       select stream last nonwhite
-# map E               select stream last
-# map Shift+Ctrl+Home  select stream top
-# map Shift+Ctrl+End   select stream bottom
-# map Shift+Ctrl+Left  select stream word left
-# map Shift+Ctrl+Right select stream word right
-
-#: Extend a stream selection.
-#: If no region is selected, start selecting.
-#: Stream selection includes all characters between the region ends.
-
-# map Alt+Left      select columnar left
-# map Alt+Right     select columnar right
-# map Alt+Up        select columnar up
-# map Alt+Down      select columnar down
-# map Alt+Page_Up   select columnar page up
-# map Alt+Page_Down select columnar page down
-# map Alt+Home      select columnar first
-# map Alt+A         select columnar first nonwhite
-# map Alt+End       select columnar last nonwhite
-# map Alt+E         select columnar last
-# map Alt+Ctrl+Home  select columnar top
-# map Alt+Ctrl+End   select columnar bottom
-# map Alt+Ctrl+Left  select columnar word left
-# map Alt+Ctrl+Right select columnar word right
-
-#: Extend a columnar selection.
-#: If no region is selected, start selecting.
-#: Columnar selection includes characters in the rectangle
-#: defined by the region ends.
-
-#: }}}
+# map h        move_char_left
+# map left     move_char_left
+# map j        move_line_down
+# map down     move_line_down
+# map k        move_line_up
+# map up       move_line_up
+# map l        move_char_right
+# map right    move_char_right
+# map w        move_next_word_start
+# map b        move_prev_word_start
+# map e        move_next_word_end
+# map W        move_next_long_word_start
+# map B        move_prev_long_word_start
+# map E        move_next_long_word_end
+# map ctrl+b   move_page_up
+# map pgup     move_page_up
+# map ctrl+f   move_page_down
+# map pgdn     move_page_down
+# map ctrl+u   move_half_page_up
+# map ctrl+d   move_half_page_down
+# map g>g      goto_file_start
+# map g>e      goto_last_line
+# map g>h      goto_line_start
+# map home     goto_line_start
+# map g>l      goto_line_end
+# map end      goto_line_end
+# map g>s      goto_first_nonwhitespace
+# map G        goto_line
+# map v        select_mode
+# map ctrl+v   columnar_mode
+# map ;        collapse_selection
+# map alt+;    flip_selections
+# map x        extend_line_below
+# map X        extend_to_line_bounds
+# map %        select_all
+# map ctrl+e   scroll_down
+# map ctrl+y   scroll_up
+# map y        yank
+# map return   yank
+# map escape   normal_mode
+# map q        quit

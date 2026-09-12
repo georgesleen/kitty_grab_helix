@@ -1,114 +1,109 @@
-# Keyboard-driven screen grabber for Kitty
+# kitty-grab-helix
 
-[Kitty][kitty] is a fast GPU-based terminal emulator.
+Keyboard-driven text selection for [kitty][kitty], with [helix][helix] keys and
+the helix selection model. A fork of [kitty_grab][upstream], whose screen
+handling it keeps and whose vim-flavoured modal editing it replaces.
 
 [kitty]: https://sw.kovidgoyal.net/kitty/
+[helix]: https://helix-editor.com/
+[upstream]: https://github.com/yurikhan/kitty_grab
 
-Kitty lets you select text in the terminal using your mouse
-and copy it to the clipboard using a key shortcut.
-However, it lacks a built-in way to select text using the keyboard.
+kitty can select text with the mouse. This adds a copy mode you drive from the
+keyboard: press a key, move the selection around the scrollback, press `y`.
 
-This project implements keyboard-driven text selection as a kitten.
+## The selection model
 
+There is always a selection, and it is never empty. The cell under the cursor
+is part of it, a motion replaces it, and `v` switches to extending it. That is
+helix, not vim: in vim you are outside a selection until you press `v`, and the
+two models diverge from the first keypress.
 
-# Minimum requirements
+Concretely:
 
-Kitty ≥0.21.2.
+- `w` selects the word it travels over, rather than moving a bare cursor.
+- `h j k l` and the goto motions leave a one-cell selection behind them.
+- `v` enters select mode, where every motion extends instead of replacing.
+- `;` collapses the selection onto the cursor, `Alt+;` flips its ends.
+- `x` takes whole lines, one more on each press.
 
-For Kitty ≥0.13.0, <0.21.0, see the tag `v0.20`,
-but be aware that version will not be updated.
+## Keys
 
+| Key | Command |
+| --- | --- |
+| `h` `j` `k` `l`, arrows | move by cell and line |
+| `w` `b` `e` | word start forwards, word start backwards, word end |
+| `W` `B` `E` | the same, treating punctuation as part of the word |
+| `g g` / `g e` | buffer start / last line |
+| `g h` / `g l` / `g s` | line start / line end / first non-whitespace |
+| `<count>G` | go to that line |
+| `Ctrl+u` / `Ctrl+d` | half page up / down |
+| `Ctrl+b` / `Ctrl+f`, page keys | page up / down |
+| `Ctrl+y` / `Ctrl+e` | scroll the view up / down |
+| `v` | select (extend) mode |
+| `Ctrl+v` | columnar selection |
+| `;` / `Alt+;` | collapse selection / flip its ends |
+| `x` / `X` | select line below / extend to line bounds |
+| `%` | select the whole buffer |
+| `y`, `Enter` | copy the selection and exit |
+| `q` | exit |
+| `Escape` | leave select mode, cancel a pending key, or exit |
 
-# Installation and initial configuration
+A count typed before a command repeats it, so `5j` and `3x` do what you expect.
 
-* Clone this repository into your Kitty configuration directory:
+`Ctrl+v` is the one key here helix does not have: helix has no columnar
+selection, and a terminal scrollback full of columns is exactly where you want
+one.
 
-      $ cd ~/.config/kitty
-      $ git clone https://github.com/yurikhan/kitty_grab.git
+## Install
 
-* In the Kitty configuration file (`kitty.conf`),
-  map a key to run the `grab.py` kitten:
+Map a key in `kitty.conf` to run the kitten:
 
-      map Alt+Insert kitten kitty_grab/grab.py
+    map ctrl+shift+x kitten /path/to/kitty-grab-helix/grab.py
 
-* Restart kitty or reload the config (`Ctrl`+`Shift`+`F5` by default, see [kitty.conf](https://sw.kovidgoyal.net/kitty/conf/#shortcut-kitty.Reload-kitty.conf)).
+Any checkout works; kitty adds the kitten's own directory to `sys.path`, so the
+sibling modules resolve without copying anything into your kitty config
+directory.
 
+With Nix, the flake exposes the kitten as a package:
 
-# Usage
+    inputs.kitty-grab-helix.url = "github:georgesleen/kitty-grab-helix";
 
-When you press the key bound to `kitten grab1.py`,
-your screen will briefly flash
-and its title will change to indicate the grabber is active.
+    programs.kitty.keybindings."ctrl+shift+x" =
+      "kitten ${inputs.kitty-grab-helix.packages.${pkgs.system}.default}/grab.py";
 
-You can now move your cursor around the screen using arrow keys.
-It will scroll if you try to go beyond the screen top or bottom.
-Hold down `Shift` while moving to select a stream region,
-or `Alt` to select a rectangular (columnar) region.
-Press `Enter` to copy the selected region to the clipboard and exit,
-or `Esc` or `q` to exit without copying.
+## Configuration
 
+Optional, and read fresh every time the kitten starts: `grab.conf` beside your
+`kitty.conf`. `grab.conf.example` lists every option and the whole default map.
 
-## Start/end of buffer
+    selection_background #5294e2
+    map ctrl+shift+p     select_all
+    map g>t              goto_file_start
+    unmap q
 
-`Ctrl`+`Home`/`End` move (or, with `Shift` or `Alt`, select)
-to the top left or bottom right of the buffer, respectively.
+Keys are written as in `kitty.conf` (`ctrl+u`, `alt+;`, `shift+x`) or as in
+helix (`C-u`, `A-;`, `X`); a sequence is chords joined with `>`. A `map` naming
+a command that does not exist, an unknown option or a malformed colour is
+reported in the kitten's title bar rather than ignored.
 
-**Note:** By default, Kitty binds `Ctrl`+`Shift`+`Home`/`End`
-to scroll the scrollback buffer to top and bottom, respectively.
-You might want to install [`kitty_scroll`][kitty_scroll]
-to be able to use these shortcuts with `kitty_grab`.
+Selecting into the primary or secondary buffer instead of the clipboard:
 
-[kitty_scroll]: https://github.com/yurikhan/kitty-smart-scroll
+    map ctrl+shift+x kitten /path/to/kitty-grab-helix/grab.py --copy-to primary
 
-    map Ctrl+Shift+Home  kitten smart_scroll.py scroll_home Ctrl+Shift+Home
-    map Ctrl+Shift+End   kitten smart_scroll.py scroll_end  Ctrl+Shift+End
+## Development
 
+    nix develop      # or direnv allow
+    make check       # ruff, nixfmt, pytest
+    nix flake check  # the same, hermetically
 
-## Word motion
+The kitten is split so that the part with the bugs in it can be tested without
+a terminal. `helix_motions.py` (motions, selection model, what a yank
+produces), `helix_keymap.py` (key naming, sequences, counts) and
+`helix_config.py` (the config file) import no kitty code and take their text
+metrics as functions; `_grab_ui.py` is the kitty half and holds the drawing,
+the key events and the clipboard.
 
-Hold down `Ctrl` while pressing `←`/`→` to move by words.
+## License
 
-
-**Note:** By default, Kitty binds `Ctrl`+`Shift`+`←`/`→`
-to activate the previous/next tab.
-That will prevent `kitty_grab`,
-as well as other terminal-based programs,
-from seeing these combinations.
-You can either bind different keys in `grab.conf`:
-
-    map Shift+Alt+B  select stream word left
-    map Shift+Alt+F  select stream word right
-
-or rebind previous/next tab to different keys in `kitty.conf`
-(recommended):
-
-    map kitty_mod+Left   no_op
-    map kitty_mod+Right  no_op
-    map Ctrl+Page_Up     previous_tab
-    map Ctrl+Page_Down   next_tab
-
-(Remember to [reload config](https://sw.kovidgoyal.net/kitty/conf/#shortcut-kitty.Reload-kitty.conf/) if you modify `kitty.conf`.)
-
-
-# Configuration
-
-See the `grab.conf.example` file.
-You will need to copy it to `~/.config/kitty/grab.conf`
-and edit to your liking.
-
-All example entries are commented out.
-Remove the `#` at the start of lines you modify.
-
-You do not need to reload config when you edit `grab.conf`.
-It will take effect the next time you use the grabber.
-
-
-# Vim-like Modal Highlighting
-
-Vim-like modal selecting is available.
-Copy the provided `grab-vim.conf.example` file, and copy it to `~/.config/kitty/grab.conf`.
-
-
-# License
-
-GNU Public License version 3 or later.
+GPL-3.0-or-later, as upstream. Copyright of the original kitty_grab code
+remains with Yuri Khan and its contributors.
