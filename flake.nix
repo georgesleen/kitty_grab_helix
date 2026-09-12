@@ -29,6 +29,12 @@
         }
       );
 
+      # For consumers who would rather have it in pkgs than reach into
+      # packages.<system>.
+      overlays.default = _final: prev: {
+        kitty_grab_helix = prev.callPackage ./package.nix { };
+      };
+
       checks = forAllSystems (
         system:
         let
@@ -53,8 +59,10 @@
               '';
 
           lint = pkgs.runCommand "kitty_grab_helix-lint" { nativeBuildInputs = [ pkgs.ruff ]; } ''
-            cd ${./.}
-            ruff check . 2>&1 | tee "$out"
+            cp -r ${./.} source
+            chmod -R +w source
+            cd source
+            ruff check --cache-dir "$TMPDIR/ruff" . 2>&1 | tee "$out"
           '';
         }
       );
