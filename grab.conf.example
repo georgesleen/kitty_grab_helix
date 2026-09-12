@@ -1,4 +1,4 @@
-# kitty-grab-helix configuration. Copy to ~/.config/kitty/grab.conf and
+# kitty_grab_helix configuration. Copy to ~/.config/kitty/grab.conf and
 # uncomment what you want to change. Nothing here needs a kitty reload: the
 # file is read each time the kitten starts.
 #

@@ -1,5 +1,5 @@
 {
-  description = "kitty-grab-helix: helix-style keyboard selection for kitty";
+  description = "kitty_grab_helix: helix-style keyboard selection for kitty";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -17,15 +17,15 @@
     in
     {
       # The kitten itself: the python modules kitty loads, in one store path.
-      # Point kitty at ${kitty-grab-helix}/grab.py.
+      # Point kitty at ${kitty_grab_helix}/grab.py.
       packages = forAllSystems (
         system:
         let
           pkgs = pkgsFor system;
         in
         rec {
-          default = kitty-grab-helix;
-          kitty-grab-helix = pkgs.callPackage ./package.nix { };
+          default = kitty_grab_helix;
+          kitty_grab_helix = pkgs.callPackage ./package.nix { };
         }
       );
 
@@ -38,7 +38,7 @@
           # The unit suites. The kitten's decision half imports no kitty code,
           # so the whole selection model runs here with no terminal.
           tests =
-            pkgs.runCommand "kitty-grab-helix-tests"
+            pkgs.runCommand "kitty_grab_helix-tests"
               {
                 nativeBuildInputs = [
                   pkgs.python3
@@ -52,7 +52,7 @@
                 pytest -q -p no:cacheprovider 2>&1 | tee "$out"
               '';
 
-          lint = pkgs.runCommand "kitty-grab-helix-lint" { nativeBuildInputs = [ pkgs.ruff ]; } ''
+          lint = pkgs.runCommand "kitty_grab_helix-lint" { nativeBuildInputs = [ pkgs.ruff ]; } ''
             cd ${./.}
             ruff check . 2>&1 | tee "$out"
           '';

@@ -1,4 +1,4 @@
-# kitty-grab-helix
+# kitty_grab_helix
 
 Keyboard-driven text selection for [kitty][kitty], with [helix][helix] keys and
 the helix selection model. A fork of [kitty_grab][upstream], whose screen
@@ -59,7 +59,7 @@ every motion would only ever be one cell.
 
 Map a key in `kitty.conf` to run the kitten:
 
-    map ctrl+shift+x kitten /path/to/kitty-grab-helix/grab.py
+    map ctrl+shift+x kitten /path/to/kitty_grab_helix/grab.py
 
 Any checkout works; kitty adds the kitten's own directory to `sys.path`, so the
 sibling modules resolve without copying anything into your kitty config
@@ -67,10 +67,10 @@ directory.
 
 With Nix, the flake exposes the kitten as a package:
 
-    inputs.kitty-grab-helix.url = "github:georgesleen/kitty-grab-helix";
+    inputs.kitty_grab_helix.url = "github:georgesleen/kitty_grab_helix";
 
     programs.kitty.keybindings."ctrl+shift+x" =
-      "kitten ${inputs.kitty-grab-helix.packages.${pkgs.system}.default}/grab.py";
+      "kitten ${inputs.kitty_grab_helix.packages.${pkgs.system}.default}/grab.py";
 
 ## Configuration
 
@@ -89,7 +89,7 @@ reported in the kitten's title bar rather than ignored.
 
 Selecting into the primary or secondary buffer instead of the clipboard:
 
-    map ctrl+shift+x kitten /path/to/kitty-grab-helix/grab.py --copy-to primary
+    map ctrl+shift+x kitten /path/to/kitty_grab_helix/grab.py --copy-to primary
 
 ## Development
 

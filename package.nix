@@ -17,11 +17,11 @@ stdenvNoCC.mkDerivation {
   '';
   meta = {
     description = "Helix-style keyboard selection and copy mode for kitty";
-    homepage = "https://github.com/georgesleen/kitty-grab-helix";
+    homepage = "https://github.com/georgesleen/kitty_grab_helix";
     license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.all;
   };
-  pname = "kitty-grab-helix";
+  pname = "kitty_grab_helix";
   src = ./.;
   version = "1.0.0";
 }
